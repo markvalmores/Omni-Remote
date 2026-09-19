@@ -32,6 +32,7 @@ interface DeviceScannerModalProps {
   onSelectDevice: (device: DiscoveredDevice) => void;
   onAddCustomDevice: (device: DiscoveredDevice) => void;
   soundEnabled: boolean;
+  onPromptDeviceConnect?: (device: DiscoveredDevice) => void;
 }
 
 export const DeviceScannerModal: React.FC<DeviceScannerModalProps> = ({
@@ -42,6 +43,7 @@ export const DeviceScannerModal: React.FC<DeviceScannerModalProps> = ({
   onSelectDevice,
   onAddCustomDevice,
   soundEnabled,
+  onPromptDeviceConnect,
 }) => {
   const [activeTab, setActiveTab] = useState<'wifi' | 'bluetooth' | 'direct_mac'>('wifi');
   const [isScanning, setIsScanning] = useState(false);
@@ -311,12 +313,18 @@ export const DeviceScannerModal: React.FC<DeviceScannerModalProps> = ({
                         ) : (
                           <button
                             onClick={() => {
-                              onSelectDevice(dev);
                               playTactileSound('click', soundEnabled);
+                              if (onPromptDeviceConnect) {
+                                onClose();
+                                onPromptDeviceConnect(dev);
+                              } else {
+                                onSelectDevice(dev);
+                              }
                             }}
-                            className="px-3 py-1.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold transition-colors"
+                            className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 text-xs font-bold transition-all shadow-sm flex items-center gap-1"
                           >
-                            Pair &amp; Control
+                            <Radio className="w-3 h-3" />
+                            <span>Pair with TV Prompt</span>
                           </button>
                         )}
                       </div>

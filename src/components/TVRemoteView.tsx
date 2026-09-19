@@ -22,7 +22,9 @@ import {
   Film, 
   Music, 
   Compass, 
-  Layers
+  Layers,
+  Radio,
+  Sparkles
 } from 'lucide-react';
 import { DiscoveredDevice } from '../types';
 import { playTactileSound, triggerHaptic } from '../services/hapticsAndAudio';
@@ -32,6 +34,7 @@ interface TVRemoteViewProps {
   onUpdateDeviceState: (updater: (prev: DiscoveredDevice) => DiscoveredDevice) => void;
   onSendKey: (key: string) => void;
   soundEnabled: boolean;
+  onDetectTV?: () => void;
 }
 
 const QUICK_APPS = [
@@ -48,6 +51,7 @@ export const TVRemoteView: React.FC<TVRemoteViewProps> = ({
   onUpdateDeviceState,
   onSendKey,
   soundEnabled,
+  onDetectTV,
 }) => {
   const isPowerOn = device?.state.power ?? true;
   const currentVol = device?.state.volume ?? 20;
@@ -95,7 +99,7 @@ export const TVRemoteView: React.FC<TVRemoteViewProps> = ({
     <div className="w-full max-w-md mx-auto py-2 px-3 sm:px-4 flex flex-col items-center select-none">
       
       {/* Device Status Bar */}
-      <div className="w-full bg-slate-900/80 border border-slate-800 rounded-2xl p-3.5 mb-3 flex items-center justify-between shadow-lg">
+      <div className="w-full bg-slate-900/80 border border-slate-800 rounded-2xl p-3.5 mb-2 flex items-center justify-between shadow-lg">
         <div className="flex items-center gap-2.5">
           <div className={`p-2 rounded-xl border transition-colors ${
             isPowerOn 
@@ -122,6 +126,24 @@ export const TVRemoteView: React.FC<TVRemoteViewProps> = ({
           <span>{isMuted ? 'MUTED' : `VOL ${currentVol}`}</span>
         </div>
       </div>
+
+      {/* Quick Trigger: Test TV Detection & Handshake Prompt */}
+      {onDetectTV && (
+        <div className="w-full mb-3 flex items-center justify-between px-3 py-1.5 rounded-xl bg-slate-900/60 border border-slate-800/80 text-[11px] text-slate-400">
+          <div className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>TV Auto-Pairing Sensor:</span>
+            <span className="text-emerald-400 font-medium">Ready</span>
+          </div>
+          <button
+            onClick={onDetectTV}
+            className="flex items-center gap-1 text-cyan-400 hover:text-cyan-300 font-bold hover:underline cursor-pointer"
+          >
+            <Radio className="w-3 h-3 text-cyan-400 animate-pulse" />
+            <span>Detect TV &amp; Prompt</span>
+          </button>
+        </div>
+      )}
 
       {/* Main Remote Shell */}
       <div className="w-full bg-[#0d1424] border border-slate-800/90 rounded-3xl p-5 shadow-2xl shadow-cyan-950/20 flex flex-col items-center gap-5">

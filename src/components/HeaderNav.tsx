@@ -42,6 +42,7 @@ interface HeaderNavProps {
   onOpenLatencyHUD: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
+  onDetectTV?: () => void;
 }
 
 export const HeaderNav: React.FC<HeaderNavProps> = ({
@@ -58,6 +59,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
   onOpenLatencyHUD,
   soundEnabled,
   onToggleSound,
+  onDetectTV,
 }) => {
   const [deviceDropdownOpen, setDeviceDropdownOpen] = React.useState(false);
 
@@ -158,7 +160,19 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
                     </button>
                   ))}
                 </div>
-                <div className="border-t border-slate-800 pt-1.5 mt-1">
+                <div className="border-t border-slate-800 pt-1.5 mt-1 space-y-1">
+                  {onDetectTV && (
+                    <button
+                      onClick={() => {
+                        setDeviceDropdownOpen(false);
+                        onDetectTV();
+                      }}
+                      className="w-full py-1.5 text-center text-emerald-400 hover:text-emerald-300 font-medium hover:bg-emerald-950/40 rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                    >
+                      <Radio className="w-3.5 h-3.5 animate-pulse text-emerald-400" />
+                      Auto-Detect Nearby TV &amp; Prompt
+                    </button>
+                  )}
                   <button
                     onClick={() => {
                       setDeviceDropdownOpen(false);
@@ -270,6 +284,18 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
               <span>{telemetry.pingMs.toFixed(1)}ms</span>
             </div>
           </button>
+
+          {/* Detect TV Prompt Button */}
+          {onDetectTV && (
+            <button
+              onClick={onDetectTV}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-950/80 border border-emerald-500/50 hover:bg-emerald-900/90 text-emerald-300 hover:text-emerald-200 text-xs font-bold transition-all shadow-sm shadow-emerald-950"
+              title="Detect Nearby Smart TV and test mutual prompt handshake"
+            >
+              <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+              <span className="hidden sm:inline">Detect TV</span>
+            </button>
+          )}
 
           {/* Cloud Sync Button */}
           <button

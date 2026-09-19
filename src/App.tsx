@@ -37,6 +37,7 @@ import { DeviceScannerModal } from './components/DeviceScannerModal';
 import { DeviceSpecWizard } from './components/DeviceSpecWizard';
 import { LatencyHUD } from './components/LatencyHUD';
 import { CloudSyncModal } from './components/CloudSyncModal';
+import { TVDetectedPromptModal } from './components/TVDetectedPromptModal';
 
 import { 
   Radio, 
@@ -103,6 +104,51 @@ export default function App() {
   const [isSpecsOpen, setIsSpecsOpen] = useState(false);
   const [isLatencyHUDOpen, setIsLatencyHUDOpen] = useState(false);
   const [isCloudSyncOpen, setIsCloudSyncOpen] = useState(false);
+  const [isTVPromptOpen, setIsTVPromptOpen] = useState(false);
+  const [detectedTVForPrompt, setDetectedTVForPrompt] = useState<DiscoveredDevice | null>(null);
+
+  // Trigger TV Detection Handler
+  const handleTriggerTVDetection = (specificDevice?: DiscoveredDevice) => {
+    let target = specificDevice;
+    if (!target) {
+      // Pick an un-connected TV, or next available TV in list
+      const availableTVs = devices.filter((d) => d.type === 'smart_tv' || d.type === 'streaming_box');
+      target = availableTVs.find((d) => d.id !== activeDeviceId) || availableTVs[0] || devices[0];
+    }
+    if (target) {
+      setDetectedTVForPrompt(target);
+      setIsTVPromptOpen(true);
+      setLastActionToast({
+        text: `mDNS Subnet: Detected Smart TV "${target.name}"`,
+        time: Date.now(),
+      });
+    }
+  };
+
+  // Connected Accepted Handler from TV Handshake
+  const handleTVConnectAccepted = (device: DiscoveredDevice) => {
+    setDevices((prev) =>
+      prev.map((d) => (d.id === device.id ? { ...d, connected: true } : d))
+    );
+    setActiveDeviceId(device.id);
+    setControlMode('remote');
+    setLastActionToast({
+      text: `Authorized & Connected to ${device.name}!`,
+      time: Date.now(),
+    });
+  };
+
+  // Auto-detect nearby TV shortly after boot for instant experience
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const candidate = devices.find((d) => d.id === 'lg-oled-bedroom') || devices[1] || devices[0];
+      if (candidate) {
+        setDetectedTVForPrompt(candidate);
+        setIsTVPromptOpen(true);
+      }
+    }, 1800);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Feedback Notification Toast
   const [lastActionToast, setLastActionToast] = useState<{ text: string; time: number } | null>(null);
@@ -268,6 +314,7 @@ export default function App() {
           setSoundEnabled(!soundEnabled);
           triggerHaptic(10, hapticEnabled);
         }}
+        onDetectTV={() => handleTriggerTVDetection()}
       />
 
       {/* First Boot Hardware Calibration Banner */}
@@ -311,6 +358,7 @@ export default function App() {
             onUpdateDeviceState={handleUpdateDeviceState}
             onSendKey={handleSendKey}
             soundEnabled={soundEnabled}
+            onDetectTV={() => handleTriggerTVDetection()}
           />
         )}
 
@@ -426,6 +474,17 @@ export default function App() {
         }}
         onAddCustomDevice={handleAddCustomDevice}
         soundEnabled={soundEnabled}
+        onPromptDeviceConnect={(dev) => handleTriggerTVDetection(dev)}
+      />
+
+      {/* TV Detection & Mutual Handshake Prompt Modal */}
+      <TVDetectedPromptModal
+        isOpen={isTVPromptOpen}
+        onClose={() => setIsTVPromptOpen(false)}
+        detectedTV={detectedTVForPrompt}
+        onConnectAccepted={handleTVConnectAccepted}
+        soundEnabled={soundEnabled}
+        clientSpecs={clientSpecs}
       />
 
       <DeviceSpecWizard
