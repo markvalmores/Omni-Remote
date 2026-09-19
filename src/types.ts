@@ -42,7 +42,11 @@ export interface DiscoveredDevice {
   latencyMs: number;
   protocol: ProtocolType;
   manufacturer: string;
+  modelNumber?: string;
   isCustomManual?: boolean;
+  isRealHardware?: boolean;
+  verificationStatus?: 'verified' | 'probing' | 'unreachable';
+  lastPingTimestamp?: number;
   state: {
     power: boolean;
     volume: number;

@@ -116,7 +116,16 @@ export const TVDetectedPromptModal: React.FC<TVDetectedPromptModalProps> = ({
   };
 
   // Get styling tailored to TV brand
-  const getBrandAccent = (brand: string) => {
+  const getBrandAccent = (brand: string, deviceName: string = '') => {
+    if (deviceName.toLowerCase().includes('googletv') || deviceName.toLowerCase().includes('google') || brand === 'android_tv') {
+      return {
+        badge: 'bg-emerald-600/30 text-emerald-300 border-emerald-500/50',
+        glow: 'shadow-emerald-500/20',
+        title: 'Google TV • Android TV 14',
+        osName: 'GOOGLE TV (GoogleTV6502)',
+      };
+    }
+
     switch (brand) {
       case 'samsung':
         return {
@@ -133,7 +142,6 @@ export const TVDetectedPromptModal: React.FC<TVDetectedPromptModalProps> = ({
           osName: 'LG webOS TV',
         };
       case 'sony':
-      case 'android_tv':
         return {
           badge: 'bg-amber-600/30 text-amber-300 border-amber-500/50',
           glow: 'shadow-amber-500/20',
@@ -164,7 +172,7 @@ export const TVDetectedPromptModal: React.FC<TVDetectedPromptModalProps> = ({
     }
   };
 
-  const brandInfo = getBrandAccent(detectedTV.brand);
+  const brandInfo = getBrandAccent(detectedTV.brand, detectedTV.name);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md transition-all">
@@ -214,7 +222,11 @@ export const TVDetectedPromptModal: React.FC<TVDetectedPromptModalProps> = ({
                       {detectedTV.name}
                     </h3>
                     <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded border ${brandInfo.badge}`}>
-                      {detectedTV.brand}
+                      {detectedTV.brand === 'android_tv' ? 'Google TV' : detectedTV.brand}
+                    </span>
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/60 text-emerald-300 flex items-center gap-1">
+                      <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                      <span>Real Hardware</span>
                     </span>
                   </div>
 
@@ -230,7 +242,7 @@ export const TVDetectedPromptModal: React.FC<TVDetectedPromptModalProps> = ({
                     <span>•</span>
                     <span>MAC: {detectedTV.macAddress}</span>
                     <span>•</span>
-                    <span className="text-emerald-400 font-bold">{detectedTV.latencyMs}ms Ping</span>
+                    <span className="text-emerald-400 font-bold">{detectedTV.latencyMs}ms Real Ping</span>
                   </div>
                 </div>
               </div>
