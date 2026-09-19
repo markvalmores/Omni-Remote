@@ -1,0 +1,7 @@
+{
+  "name": "OmniRemote - Universal Smart TV & IoT Controller",
+  "description": "Universal Wi-Fi & Bluetooth smart remote for all Smart TVs and IoT hardware with low-latency gamepad, trackpad, full F1-F12 keyboard, numpad, device detection, MAC pairing, macro automation, and cloud-synced keybind profiles.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
